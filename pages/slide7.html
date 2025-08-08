@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경쟁 솔루션 대비 LLOS의 차별점</title>
+    <link rel="stylesheet" href="../global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .slide {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 40px 70px 20px;
+            background-color: #1976d2;
+            color: white;
+        }
+        .title {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 40px 70px;
+            display: flex;
+            flex-direction: column;
+        }
+        .comparison-intro {
+            margin-bottom: 30px;
+        }
+        .intro-text {
+            font-size: 22px;
+            line-height: 1.5;
+            color: #555;
+        }
+        .highlight {
+            color: #1976d2;
+            font-weight: 600;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            flex-grow: 1;
+        }
+        .comparison-table th {
+            background-color: #1976d2;
+            color: white;
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .comparison-table th:first-child {
+            width: 25%;
+        }
+        .comparison-table td {
+            padding: 16px 20px;
+            font-size: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f5f7fa;
+        }
+        .comparison-table tr:nth-child(odd) {
+            background-color: white;
+        }
+        .feature-name {
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .feature-icon {
+            margin-right: 12px;
+            color: #1976d2;
+        }
+        .status-complete {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        .status-partial {
+            color: #f57c00;
+            font-weight: 600;
+        }
+        .status-basic {
+            color: #0277bd;
+            font-weight: 600;
+        }
+        .status-none {
+            color: #c62828;
+            font-weight: 600;
+        }
+        .llos-column {
+            background-color: rgba(25, 118, 210, 0.08);
+        }
+        .key-differentiators {
+            margin-top: 30px;
+            background-color: #f0f4f8;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .differentiators-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        .differentiators-title i {
+            margin-right: 12px;
+            font-size: 28px;
+        }
+        .differentiators-list {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .differentiator-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #1976d2;
+        }
+        .differentiator-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <h1 class="title">경쟁 솔루션 대비 LLOS의 차별점</h1>
+        </div>
+        <div class="content">
+            <div class="comparison-intro">
+                <p class="intro-text">LLOS는 <span class="highlight">운영체제적 접근 방식</span>을 통해 기존 솔루션의 한계를 극복합니다</p>
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>기능</th>
+                        <th>LangChain</th>
+                        <th>Agents API</th>
+                        <th>AutoGen</th>
+                        <th class="llos-column">LLOS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="feature-name">
+                                <i class="material-icons feature-icon">sync_alt</i>
+                                운영체제적 일관성
+                            </div>
+                        </td>
+                        <td><span class="status-partial">부분</span></td>
+                        <td><span class="status-none">없음</span></td>
+                        <td><span class="status-partial">부분</span></td>
+                        <td class="llos-column"><span class="status-complete">완전</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="feature-name">
+                                <i class="material-icons feature-icon">admin_panel_settings</i>
+                                권한/과금 관리
+                            </div>
+                        </td>
+                        <td><span class="status-none">없음</span></td>
+                        <td><span class="status-basic">기본</span></td>
+                        <td><span class="status-partial">부분</span></td>
+                        <td class="llos-column"><span class="status-complete">완전</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="feature-name">
+                                <i class="material-icons feature-icon">memory</i>
+                                표준 커널 아키텍처
+                            </div>
+                        </td>
+                        <td><span class="status-none">없음</span></td>
+                        <td><span class="status-none">없음</span></td>
+                        <td><span class="status-none">없음</span></td>
+                        <td class="llos-column"><span class="status-complete">있음</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="feature-name">
+                                <i class="material-icons feature-icon">hub</i>
+                                에이전트 생태계
+                            </div>
+                        </td>
+                        <td><span class="status-basic">기본</span></td>
+                        <td><span class="status-basic">기본</span></td>
+                        <td><span class="status-partial">고급</span></td>
+                        <td class="llos-column"><span class="status-complete">고급</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="key-differentiators">
+                <div class="differentiators-title">
+                    <i class="material-icons">stars</i>
+                    LLOS 핵심 차별점
+                </div>
+                <div class="differentiators-list">
+                    <div class="differentiator-item">
+                        <div class="differentiator-text">통합 컨텍스트 관리</div>
+                    </div>
+                    <div class="differentiator-item">
+                        <div class="differentiator-text">체계적 권한/과금 체계</div>
+                    </div>
+                    <div class="differentiator-item">
+                        <div class="differentiator-text">표준화된 커널 아키텍처</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

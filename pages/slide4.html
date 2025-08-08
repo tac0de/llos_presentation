@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLOS 커널 구성</title>
+    <link rel="stylesheet" href="../global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .slide {
+            width: 1280px;
+            min-height: 720px;
+            position: relative;
+            overflow: hidden;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 40px 70px 20px;
+            background-color: #1976d2;
+            color: white;
+        }
+        .title {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 40px 70px;
+            display: flex;
+            flex-direction: column;
+        }
+        .kernel-components {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+            flex-grow: 1;
+        }
+        .component-card {
+            background-color: #f5f7fa;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.3s ease;
+            border-left: 5px solid #1976d2;
+            display: flex;
+            flex-direction: column;
+        }
+        .component-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .component-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .component-icon {
+            background-color: rgba(25, 118, 210, 0.1);
+            color: #1976d2;
+            border-radius: 50%;
+            padding: 12px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .component-icon i {
+            font-size: 28px;
+        }
+        .component-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        .component-desc {
+            font-size: 20px;
+            line-height: 1.5;
+            color: #555;
+            flex-grow: 1;
+        }
+        .diagram {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .diagram-container {
+            background-color: #f0f4f8;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .diagram-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #1976d2;
+            text-align: center;
+        }
+        .kernel-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .central-hub {
+            background-color: #1976d2;
+            color: white;
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+            z-index: 2;
+        }
+        .components-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+        }
+        .component-block {
+            background-color: #64b5f6;
+            color: white;
+            border-radius: 8px;
+            padding: 16px;
+            width: 22%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+        .component-block.context {
+            background-color: #42a5f5;
+        }
+        .component-block.routing {
+            background-color: #2196f3;
+        }
+        .component-block.resource {
+            background-color: #1e88e5;
+        }
+        .component-block.logging {
+            background-color: #1976d2;
+        }
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .connection-line {
+            position: absolute;
+            background-color: #90caf9;
+            height: 3px;
+            width: 100px;
+            transform-origin: center;
+        }
+        .connection-line.line-1 {
+            transform: rotate(45deg);
+            left: 22%;
+            top: 50%;
+        }
+        .connection-line.line-2 {
+            transform: rotate(135deg);
+            right: 22%;
+            top: 50%;
+        }
+        .connection-line.line-3 {
+            transform: rotate(-45deg);
+            left: 22%;
+            bottom: 50%;
+        }
+        .connection-line.line-4 {
+            transform: rotate(-135deg);
+            right: 22%;
+            bottom: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide">
+        <div class="header">
+            <h1 class="title">LLOS 커널 구성</h1>
+        </div>
+        <div class="content">
+            <div class="kernel-components">
+                <div class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">
+                            <i class="material-icons">storage</i>
+                        </div>
+                        <div class="component-title">컨텍스트/메모리 관리</div>
+                    </div>
+                    <div class="component-desc">
+                        세션 및 대화 상태 유지
+                    </div>
+                </div>
+                
+                <div class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">
+                            <i class="material-icons">route</i>
+                        </div>
+                        <div class="component-title">라우팅/오케스트레이션</div>
+                    </div>
+                    <div class="component-desc">
+                        요청 분배 및 처리 흐름 제어
+                    </div>
+                </div>
+                
+                <div class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">
+                            <i class="material-icons">admin_panel_settings</i>
+                        </div>
+                        <div class="component-title">자원/권한</div>
+                    </div>
+                    <div class="component-desc">
+                        사용량 모니터링 및 접근 제어
+                    </div>
+                </div>
+                
+                <div class="component-card">
+                    <div class="component-header">
+                        <div class="component-icon">
+                            <i class="material-icons">fact_check</i>
+                        </div>
+                        <div class="component-title">로깅/감사</div>
+                    </div>
+                    <div class="component-desc">
+                        모든 상호작용 기록 및 추적
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diagram">
+                <div class="diagram-container">
+                    <div class="diagram-title">커널 구성 요소 상호작용</div>
+                    <div class="kernel-diagram">
+                        <div class="central-hub">LLOS<br>커널</div>
+                        <div class="components-row">
+                            <div class="component-block context">컨텍스트<br>관리</div>
+                            <div class="component-block routing">라우팅<br>오케스트레이션</div>
+                            <div class="component-block resource">자원<br>권한</div>
+                            <div class="component-block logging">로깅<br>감사</div>
+                            <div class="connection-lines">
+                                <div class="connection-line line-1"></div>
+                                <div class="connection-line line-2"></div>
+                                <div class="connection-line line-3"></div>
+                                <div class="connection-line line-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
