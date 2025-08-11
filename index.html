@@ -1,48 +1,991 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLOS: LLM을 위한 운영체제</title>
-
+    <title>LLOS (LOVELACE OS) - 운영체제형 멀티에이전트 플랫폼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        iframe .slide {
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #ffeb3b;
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.15);
+            --card-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
             margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100vw;
+            background: rgba(102, 126, 234, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: block;
+            cursor: pointer;
+        }
+
+        .material-icons {
+            font-size: 28px;
+            color: var(--text-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 0 40px;
+            position: relative;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .shape-2 {
+            width: 250px;
+            height: 250px;
+            bottom: -50px;
+            left: -50px;
+        }
+
+        .hero-title {
+            font-size: 60px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .hero-description {
+            font-size: 20px;
+            max-width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .highlight-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px 30px;
+            margin: 20px 0;
+            border: 1px solid var(--card-border);
+        }
+
+        .highlight-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        /* Section Styling */
+        section {
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 22px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .card-content {
+            font-size: 18px;
+        }
+
+        /* Definition Section */
+        .definition-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* Structure Section */
+        .layer-card {
+            border-left: 5px solid;
+            margin-bottom: 30px;
+        }
+
+        .core-layer {
+            border-color: #ffeb3b;
+        }
+
+        .service-layer {
+            border-color: #4fc3f7;
+        }
+
+        .interface-layer {
+            border-color: #81c784;
+        }
+
+        .layer-components {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .component-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .component-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .component-text {
+            font-size: 18px;
+        }
+
+        /* Tech Stack Section */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .tech-card {
+            border-left: 5px solid;
+        }
+
+        .frontend-card {
+            border-color: #4fc3f7;
+        }
+
+        .backend-card {
+            border-color: #81c784;
+        }
+
+        .db-card {
+            border-color: #ffb74d;
+        }
+
+        .llm-card {
+            border-color: #f06292;
+        }
+
+        .embedding-card {
+            border-color: #9575cd;
+        }
+
+        .search-card {
+            border-color: #4db6ac;
+        }
+
+        .automation-card {
+            border-color: #ff8a65;
+        }
+
+        .infra-card {
+            border-color: #a1c181;
+        }
+
+        .tech-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .tech-bullet {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .tech-name {
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        /* Why LLOS Section */
+        .reason-card {
+            border-left: 5px solid;
+            margin-bottom: 25px;
+        }
+
+        .problem-card {
+            border-color: #ff5252;
+        }
+
+        .solution-card {
+            border-color: #4fc3f7;
+        }
+
+        .advantage-card {
+            border-color: #81c784;
+        }
+
+        .key-point {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 3px 8px;
+            margin: 3px 0;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100vw;
+            width: 80%;
+            height: 100%;
+            background: var(--primary-color);
+            z-index: 1001;
+            padding: 70px 20px 20px;
+            transition: right 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            right: 23vw;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .mobile-menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mobile-menu-link {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex;
+                gap: 20px;
+            }
+
+            .menu-toggle {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: 72px;
+            }
+
+            .hero-subtitle {
+                font-size: 32px;
+            }
+
+            .hero-description {
+                font-size: 24px;
+            }
+
+            .definition-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .layer-components {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
-
 <body>
-    <iframe src="pages/slide1.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide2.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide3.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide4.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide5.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide6.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide7.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide8.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide9.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide10.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide11.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide12.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide13.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
-        <iframe src="pages/slide14.html" style="width:100%"
-        onload="this.style.height=this.contentWindow.document.body.scrollHeight+'px'"></iframe>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">LLOS</div>
+            <div class="nav-links">
+                <a href="#definition" class="mobile-menu-link">정의</a>
+                <a href="#structure" class="mobile-menu-link">구조</a>
+                <a href="#tech-stack" class="mobile-menu-link">기술 스택</a>
+                <a href="#why-llos" class="mobile-menu-link">왜 LLOS인가</a>
+            </div>
+            <div class="menu-toggle" id="menuToggle">
+                <i class="material-icons">menu</i>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-close" id="mobileMenuClose">
+            <i class="material-icons">close</i>
+        </div>
+        <div class="mobile-menu-links">
+            <a href="#definition" class="mobile-menu-link">정의</a>
+            <a href="#structure" class="mobile-menu-link">구조</a>
+            <a href="#tech-stack" class="mobile-menu-link">기술 스택</a>
+            <a href="#why-llos" class="mobile-menu-link">왜 LLOS인가</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="container">
+            <h1 class="hero-title">LLOS</h1>
+            <h2 class="hero-subtitle">LOVELACE OS</h2>
+            <p class="hero-description">
+                다중 LLM·에이전트를 연결해 인간의 작업을 분산·자동화하는
+            </p>
+            <div class="highlight-box">
+                <p class="highlight-text">운영체제형 멀티에이전트 플랫폼</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Definition Section -->
+    <section id="definition">
+        <div class="container">
+            <h2 class="section-title">LLOS 정의</h2>
+            <p class="section-subtitle">운영체제형 멀티에이전트 플랫폼의 핵심 요소</p>
+            
+            <div class="definition-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">badge</i>
+                        </div>
+                        <h3 class="card-title">이름</h3>
+                    </div>
+                    <div class="card-content">
+                        <p><span class="highlight">LLOS</span> (LOVELACE OS)</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">architecture</i>
+                        </div>
+                        <h3 class="card-title">본질</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>여러 LLM과 전용 에이전트를 조율하는 <span class="highlight">OS 레벨의 플랫폼</span></p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">rocket_launch</i>
+                        </div>
+                        <h3 class="card-title">목표</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>인간 작업을 분산·자동화하고, 장기 컨텍스트와 <span class="highlight">철학적 의사결정</span>을 내재화</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">auto_fix_high</i>
+                        </div>
+                        <h3 class="card-title">차별점</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>프레임워크에 종속되지 않고, <span class="highlight">핵심 로직을 직접 구현</span>해 유지보수성과 제어력 확보</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Structure Section -->
+    <section id="structure">
+        <div class="container">
+            <h2 class="section-title">LLOS 구조</h2>
+            <p class="section-subtitle">3계층 아키텍처로 구성된 멀티에이전트 플랫폼</p>
+            
+            <!-- Core Layer -->
+            <div class="card layer-card core-layer">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">memory</i>
+                    </div>
+                    <h3 class="card-title">Core Layer</h3>
+                </div>
+                
+                <div class="layer-components">
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">router</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Prompt Router</span><br>요청 라우팅</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">storage</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Context Memory</span><br>장기·단기 메모리</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">search</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">RAG Search</span><br>Vector DB + 웹 검색</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">hub</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Agent Orchestrator</span><br>멀티에이전트 협업</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">integration_instructions</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Embedding Service</span><br>LLOSEmbedding 클래스</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Service Layer -->
+            <div class="card layer-card service-layer">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">miscellaneous_services</i>
+                    </div>
+                    <h3 class="card-title">Service Layer</h3>
+                </div>
+                
+                <div class="layer-components">
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">code</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Code/Design Agent</span><br>ESLint, Storybook, UI 리뷰</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">description</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Content Agent</span><br>슬라이드, 문서, 마케팅 카피</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">casino</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">MTG Assistant</span><br>카드·덱 빌딩 및 검색</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">health_and_safety</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Health Info Agent</span><br>정보 + 안전 가이드</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Interface Layer -->
+            <div class="card layer-card interface-layer">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">devices</i>
+                    </div>
+                    <h3 class="card-title">Interface Layer</h3>
+                </div>
+                
+                <div class="layer-components">
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">web</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Web UI</span><br>Next.js + Capacitor</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">api</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">API Layer</span><br>FastAPI, JSON 응답</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons" style="font-size: 24px; margin-left: 24px;">database</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">Supabase Backend</span><br>Auth, DB, Vector Storage</p>
+                    </div>
+                    
+                    <div class="component-item">
+                        <div class="component-icon">
+                            <i class="material-icons">integration_instructions</i>
+                        </div>
+                        <p class="component-text"><span class="highlight">External APIs</span><br>OpenAI, Web Search</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack Section -->
+    <section id="tech-stack">
+        <div class="container">
+            <h2 class="section-title">기술 스택</h2>
+            <p class="section-subtitle">LLOS 구현에 필요한 기술들</p>
+            
+            <div class="tech-grid">
+                <!-- Frontend -->
+                <div class="card tech-card frontend-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">devices</i>
+                        </div>
+                        <h3 class="card-title">Frontend</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Next.js</span>
+                            <span>React 기반 프레임워크</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Capacitor</span>
+                            <span>멀티플랫폼 지원</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backend -->
+                <div class="card tech-card backend-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">settings</i>
+                        </div>
+                        <h3 class="card-title">Backend</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">FastAPI</span>
+                            <span>고성능 API 프레임워크</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Python</span>
+                            <span>에이전트 로직 구현</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DB/Storage -->
+                <div class="card tech-card db-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">storage</i>
+                        </div>
+                        <h3 class="card-title">DB/Storage</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Supabase</span>
+                            <span>PostgreSQL 기반 백엔드</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">pgvector</span>
+                            <span>벡터 데이터 저장</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- LLM API -->
+                <div class="card tech-card llm-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">psychology</i>
+                        </div>
+                        <h3 class="card-title">LLM API</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">OpenAI</span>
+                            <span>GPT-4o/5 모델</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">API Router</span>
+                            <span>멀티모델 지원</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Embedding -->
+                <div class="card tech-card embedding-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">integration_instructions</i>
+                        </div>
+                        <h3 class="card-title">Embedding</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">OpenAI Embeddings</span>
+                            <span>고차원 벡터 변환</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">LLOSEmbedding</span>
+                            <span>컨텍스트 유지</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search -->
+                <div class="card tech-card search-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">search</i>
+                        </div>
+                        <h3 class="card-title">Search</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Web Search API</span>
+                            <span>실시간 정보 검색</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">match_chunks</span>
+                            <span>RAG 기반 응답</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Automation -->
+                <div class="card tech-card automation-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">schedule</i>
+                        </div>
+                        <h3 class="card-title">Automation</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Scheduler</span>
+                            <span>정기 태스크 실행</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Event Bus</span>
+                            <span>에이전트 트리거</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Infra -->
+                <div class="card tech-card infra-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="material-icons">cloud</i>
+                        </div>
+                        <h3 class="card-title">Infra</h3>
+                    </div>
+                    
+                    <div class="tech-items">
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Docker</span>
+                            <span>컨테이너화</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Vercel</span>
+                            <span>프론트엔드 호스팅</span>
+                        </div>
+                        
+                        <div class="tech-item">
+                            <div class="tech-bullet"></div>
+                            <span class="tech-name">Supabase Hosting</span>
+                            <span>백엔드 호스팅</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why LLOS Section -->
+    <section id="why-llos">
+        <div class="container">
+            <h2 class="section-title">왜 LLOS가 필요한가</h2>
+            <p class="section-subtitle">기존 프레임워크의 한계와 LLOS의 차별화된 가치</p>
+            
+            <!-- Problem -->
+            <div class="card reason-card problem-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">warning</i>
+                    </div>
+                    <h3 class="card-title">기존 프레임워크의 한계</h3>
+                </div>
+                
+                <div class="card-content">
+                    <p>LangChain/LangGraph 같은 프레임워크는 특정 패턴과 구조에 <span class="highlight">종속적</span>입니다. 장기 유지보수와 확장 시 <span class="key-point">제약</span>이 발생하며, 복잡한 컨텍스트 관리에 어려움이 있습니다.</p>
+                </div>
+            </div>
+            
+            <!-- Solution -->
+            <div class="card reason-card solution-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">extension</i>
+                    </div>
+                    <h3 class="card-title">플러그인 방식의 확장성</h3>
+                </div>
+                
+                <div class="card-content">
+                    <p>OS 레벨로 에이전트를 관리하면 <span class="highlight">플러그인 방식</span>으로 도메인별 에이전트를 쉽게 추가할 수 있습니다. 각 에이전트는 독립적으로 개발되고 통합될 수 있어 <span class="key-point">유연한 확장</span>이 가능합니다.</p>
+                </div>
+            </div>
+            
+            <!-- Advantage -->
+            <div class="card reason-card advantage-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="material-icons">psychology</i>
+                    </div>
+                    <h3 class="card-title">철학적 의사결정 지원</h3>
+                </div>
+                
+                <div class="card-content">
+                    <p>철학적 메타 레이어를 통해 단순 도구가 아닌 <span class="highlight">의사결정 지원 시스템</span>으로 발전할 수 있습니다. 장기 컨텍스트와 철학적 사고를 내재화하여 <span class="key-point">인간과의 협업</span>을 최적화합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-content">© 2025 LLOS (LOVELACE OS) - <span class="highlight">운영체제형 멀티에이전트 플랫폼</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
-
 </html>
